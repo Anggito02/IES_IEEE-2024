@@ -11,11 +11,12 @@ python -u run.py \
   --data custom \
   --features M \
   --seq_len 36 \
+  --label_len 18 \
   --pred_len 24 \
   --e_layers 3 \
-  --enc_in 321 \
-  --dec_in 321 \
-  --c_out 321 \
+  --enc_in 7 \
+  --dec_in 7 \
+  --c_out 7 \
   --des 'Exp' \
   --d_model 512 \
   --d_ff 512 \

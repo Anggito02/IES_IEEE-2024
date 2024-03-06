@@ -132,3 +132,11 @@ dmypy.json
 
 # Dataset
 dataset
+
+# Runner
+run_debug.py
+
+# Result
+results
+test_results
+result_long_term_forecast.txt
