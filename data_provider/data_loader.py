@@ -275,16 +275,17 @@ class Dataset_Custom(Dataset):
         s_end = s_begin + self.seq_len
         r_begin = s_end - self.label_len
         r_end = r_begin + self.label_len + self.pred_len
+        d_begin = s_begin
+        d_end = s_end + self.pred_len
 
         seq_x = self.data_x[s_begin:s_end]
         seq_y = self.data_y[r_begin:r_end]
         seq_x_mark = self.data_stamp[s_begin:s_end]
         seq_y_mark = self.data_stamp[r_begin:r_end]
 
-        date_x = self.data_date[s_begin:s_end]
-        date_y = self.data_date[r_begin:r_end]
+        date_pred = self.data_date[d_begin:d_end]
 
-        return seq_x, seq_y, seq_x_mark, seq_y_mark, date_x, date_y
+        return seq_x, seq_y, seq_x_mark, seq_y_mark, date_pred
 
     def __len__(self):
         return len(self.data_x) - self.seq_len - self.pred_len + 1
@@ -471,6 +472,9 @@ class Dataset_Pred(Dataset):
         '''
         df_raw.columns: ['date', ...(other features), target feature]
         '''
+        self.feats = list(df_raw.columns)
+        self.feats.remove('date')
+
         if self.cols:
             cols = self.cols.copy()
             cols.remove(self.target)
@@ -500,6 +504,7 @@ class Dataset_Pred(Dataset):
 
         df_stamp = pd.DataFrame(columns=['date'])
         df_stamp.date = list(tmp_stamp.date.values) + list(pred_dates[1:])
+        data_date = np.array(df_stamp.date)
         if self.timeenc == 0:
             df_stamp['month'] = df_stamp.date.apply(lambda row: row.month, 1)
             df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
@@ -518,12 +523,15 @@ class Dataset_Pred(Dataset):
         else:
             self.data_y = data[border1:border2]
         self.data_stamp = data_stamp
+        self.data_date = (data_date - np.datetime64('1970-01-01T00:00:00.000000000')) / np.timedelta64(1, 's')
 
     def __getitem__(self, index):
         s_begin = index
         s_end = s_begin + self.seq_len
         r_begin = s_end - self.label_len
         r_end = r_begin + self.label_len + self.pred_len
+        d_begin = s_begin
+        d_end = s_end + self.pred_len
 
         seq_x = self.data_x[s_begin:s_end]
         if self.inverse:
@@ -533,7 +541,9 @@ class Dataset_Pred(Dataset):
         seq_x_mark = self.data_stamp[s_begin:s_end]
         seq_y_mark = self.data_stamp[r_begin:r_end]
 
-        return seq_x, seq_y, seq_x_mark, seq_y_mark
+        date_pred = self.data_date[d_begin:d_end]
+
+        return seq_x, seq_y, seq_x_mark, seq_y_mark, date_pred
 
     def __len__(self):
         return len(self.data_x) - self.seq_len + 1

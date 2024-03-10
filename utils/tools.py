@@ -81,9 +81,9 @@ def visual(true, preds=None, date_data=None, title='', name='./pic/test.pdf'):
     """
     plt.figure()
     plt.title(title)
-    plt.plot(true, label='GroundTruth', linewidth=2)
     if preds is not None:
         plt.plot(preds, label='Prediction', linewidth=2)
+    plt.plot(true, label='GroundTruth', linewidth=2)
 
     if date_data is not None:
         date_data = pd.to_datetime(date_data)
