@@ -133,10 +133,13 @@ dmypy.json
 # Dataset
 dataset
 
-# Runner
+# Runner Test
 run_debug.py
+check.ipynb
 
 # Result
+checkpoints
 results
 test_results
+test_results_debug
 result_long_term_forecast.txt

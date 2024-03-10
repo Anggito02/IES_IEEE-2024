@@ -193,15 +193,22 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
         preds = []
         trues = []
-        folder_path = './test_results/' + setting + '/'
+        # folder_path = './test_results/' + setting + '/'
+        # if not os.path.exists(folder_path):
+        #     os.makedirs(folder_path)
+
+        folder_path = './test_results_debug/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
         self.model.eval()
         with torch.no_grad():
-            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(test_loader):
+            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark, date_x, date_y) in enumerate(test_loader):
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float().to(self.device)
+
+                date_x = np.datetime64('1970-01-01T00:00:00') + np.array(date_x, dtype='timedelta64[s]')
+                date_y = np.datetime64('1970-01-01T00:00:00') + np.array(date_y, dtype='timedelta64[s]')
 
                 if 'PEMS' in self.args.data or 'Solar' in self.args.data:
                     batch_x_mark = None
@@ -232,6 +239,10 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
                 outputs = outputs.detach().cpu().numpy()
                 batch_y = batch_y.detach().cpu().numpy()
+
+                date_x = date_x[:, -self.args.pred_len:, :]
+                date_y = date_y[:, -self.args.pred_len:, :]
+
                 if test_data.scale and self.args.inverse:
                     shape = outputs.shape
                     outputs = test_data.inverse_transform(outputs.squeeze(0)).reshape(shape)
@@ -244,15 +255,23 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 trues.append(true)
                 if i % 20 == 0:
                     input = batch_x.detach().cpu().numpy()
-                    if test_data.scale and self.args.inverse:
-                        shape = input.shape
-                        input = test_data.inverse_transform(input.squeeze(0)).reshape(shape)
-                    gt = np.concatenate((input[0, :, -1], true[0, :, -1]), axis=0)
-                    pd = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)
-                    visual(gt, pd, os.path.join(folder_path, str(i) + '.pdf'))
+                    for feat_idx in range(self.args.enc_in):   # visual for every features
+                        if test_data.scale and self.args.inverse:
+                            shape = input.shape
+                            input = test_data.inverse_transform(input.squeeze(0)).reshape(shape)
+                        gt = np.concatenate((input[0, :, feat_idx], true[0, :, feat_idx]), axis=0)
+                        pd = np.concatenate((input[0, :, feat_idx], pred[0, :, feat_idx]), axis=0)
+                        dt = np.concatenate((date_x[0, :, 0], date_y[0, :, 0]), axis=0)
+
+                        feat_path = folder_path + f"feat_{feat_idx}"
+                        if not os.path.exists(feat_path):
+                            os.makedirs(feat_path)
+
+                        visual(gt, pd, os.path.join(feat_path, str(i) + '.pdf'))
 
         preds = np.array(preds)
         trues = np.array(trues)
+
         print('test shape:', preds.shape, trues.shape)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
         trues = trues.reshape(-1, trues.shape[-2], trues.shape[-1])
