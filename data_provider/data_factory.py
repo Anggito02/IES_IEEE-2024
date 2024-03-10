@@ -22,17 +22,20 @@ def data_provider(args, flag):
         drop_last = True
         batch_size = 1  # bsz=1 for evaluation
         freq = args.freq
+        scale = False
     elif flag == 'pred':
         shuffle_flag = False
         drop_last = False
         batch_size = 1
         freq = args.freq
         Data = Dataset_Pred
+        scale = False
     else:
         shuffle_flag = True
         drop_last = True
         batch_size = args.batch_size  # bsz for train and valid
         freq = args.freq
+        scale = True
 
     data_set = Data(
         root_path=args.root_path,
@@ -43,7 +46,7 @@ def data_provider(args, flag):
         target=args.target,
         timeenc=timeenc,
         freq=freq,
-        scale=False
+        scale=scale
     )
     print(flag, len(data_set))
     data_loader = DataLoader(

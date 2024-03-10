@@ -240,7 +240,6 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 outputs = outputs.detach().cpu().numpy()
                 batch_y = batch_y.detach().cpu().numpy()
 
-                date_x = date_x[:, -self.args.pred_len:, :]
                 date_y = date_y[:, -self.args.pred_len:, :]
 
                 if test_data.scale and self.args.inverse:
@@ -253,6 +252,9 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
                 preds.append(pred)
                 trues.append(true)
+
+                feats = test_data.feats
+
                 if i % 20 == 0:
                     input = batch_x.detach().cpu().numpy()
                     for feat_idx in range(self.args.enc_in):   # visual for every features
@@ -263,11 +265,11 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                         pd = np.concatenate((input[0, :, feat_idx], pred[0, :, feat_idx]), axis=0)
                         dt = np.concatenate((date_x[0, :, 0], date_y[0, :, 0]), axis=0)
 
-                        feat_path = folder_path + f"feat_{feat_idx}"
+                        feat_path = folder_path + f"feat_{feat_idx}/"
                         if not os.path.exists(feat_path):
                             os.makedirs(feat_path)
 
-                        visual(gt, pd, os.path.join(feat_path, str(i) + '.pdf'))
+                        visual(gt, pd, dt, feats[feat_idx], os.path.join(feat_path, str(i) + '.pdf'))
 
         preds = np.array(preds)
         trues = np.array(trues)

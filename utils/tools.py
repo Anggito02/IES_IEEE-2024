@@ -75,14 +75,21 @@ class StandardScaler():
         return (data * self.std) + self.mean
 
 
-def visual(true, preds=None, name='./pic/test.pdf'):
+def visual(true, preds=None, date_data=None, title='', name='./pic/test.pdf'):
     """
     Results visualization
     """
     plt.figure()
+    plt.title(title)
     plt.plot(true, label='GroundTruth', linewidth=2)
     if preds is not None:
         plt.plot(preds, label='Prediction', linewidth=2)
+
+    if date_data is not None:
+        date_data = pd.to_datetime(date_data)
+        plt.xticks(range(0, len(date_data), 24),
+                   date_data[::24], rotation=45)
+        
     plt.legend()
     plt.savefig(name, bbox_inches='tight')
 
