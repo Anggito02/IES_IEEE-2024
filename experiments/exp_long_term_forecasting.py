@@ -203,8 +203,6 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float().to(self.device)
 
-                date = np.datetime64('1970-01-01T00:00:00') + np.array(date, dtype='timedelta64[s]').reshape(-1)
-
                 if 'PEMS' in self.args.data or 'Solar' in self.args.data:
                     batch_x_mark = None
                     batch_y_mark = None
@@ -261,7 +259,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                         if not os.path.exists(feat_path):
                             os.makedirs(feat_path)
 
-                        visual(gt, pd, date, feats[feat_idx], os.path.join(feat_path, str(i) + '.pdf'))
+                        visual(gt, pd, None, feats[feat_idx], os.path.join(feat_path, str(i) + '.pdf'))
 
         preds = np.array(preds)
         trues = np.array(trues)
