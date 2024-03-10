@@ -134,6 +134,7 @@ dmypy.json
 dataset
 
 # Runner Test
+run_debug_illness.py
 run_debug.py
 check.ipynb
 
