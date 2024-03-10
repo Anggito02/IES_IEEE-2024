@@ -142,5 +142,6 @@ check.ipynb
 checkpoints
 results
 test_results
+pred_results
 test_results_debug
 result_long_term_forecast.txt
