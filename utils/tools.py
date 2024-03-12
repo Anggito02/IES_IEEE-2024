@@ -92,7 +92,7 @@ def visual(true, preds=None, date_data=None, title='', name='./pic/test.png'):
             color = 'red'
 
         ax.plot(preds, label='Prediction', linewidth=2, color=color)
-    ax.plot(true, label='GroundTruth', linewidth=2, color='#AFAFAF')
+    ax.plot(true, label='GroundTruth', linewidth=2, color='#3C3C3C')
 
     ax.set_ylabel(metric)
     if date_data is not None:
