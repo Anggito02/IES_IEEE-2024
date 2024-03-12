@@ -346,7 +346,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                     feat_path = folder_path + f"feat_{i}/"
                     if not os.path.exists(feat_path):
                         os.makedirs(feat_path)
-                    visual(gt, pd, date_pred, feats[i], os.path.join(feat_path, str(i) + '.pdf'))
+                    visual(gt, pd, date_pred, feats[i], os.path.join(feat_path, str(i) + '.png'))
 
         preds = np.array(preds)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
