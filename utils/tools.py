@@ -86,7 +86,7 @@ def visual(true, preds=None, date_data=None, title='', name='./pic/test.png'):
 
     if preds is not None:
         color = 'orange'
-        if (preds[-1] >= preds[len(true)]):
+        if (preds[-1] >= preds[len(true)-1]):
             color = 'blue'
         else:
             color = 'red'

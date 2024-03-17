@@ -248,18 +248,19 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
                 if i % 20 == 0:
                     input = batch_x.detach().cpu().numpy()
-                    for feat_idx in range(self.args.enc_in):   # visual for every features
+                    feat_idx = self.args.enc_in if feats[-1] != "OT" else self.args.enc_in - 1
+                    for fi in range(feat_idx):   # visual for every features
                         if test_data.scale and self.args.inverse:
                             shape = input.shape
                             input = test_data.inverse_transform(input.squeeze(0)).reshape(shape)
-                        gt = np.concatenate((input[0, :, feat_idx], true[0, :, feat_idx]), axis=0)
-                        pd = np.concatenate((input[0, :, feat_idx], pred[0, :, feat_idx]), axis=0)
+                        gt = np.concatenate((input[0, :, fi], true[0, :, fi]), axis=0)
+                        pd = np.concatenate((input[0, :, fi], pred[0, :, fi]), axis=0)
 
-                        feat_path = folder_path + f"feat_{feat_idx}/"
+                        feat_path = folder_path + f"feat_{fi}/"
                         if not os.path.exists(feat_path):
                             os.makedirs(feat_path)
 
-                        visual(gt, pd, None, feats[feat_idx], os.path.join(feat_path, str(i) + '.pdf'))
+                        visual(gt, pd, None, feats[fi], os.path.join(feat_path, str(i) + '.pdf'))
 
         preds = np.array(preds)
         trues = np.array(trues)
@@ -339,7 +340,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
                 feats = pred_data.feats
 
-                for i in range(self.args.enc_in):
+                feat_idx = self.args.enc_in if feats[-1] != "OT" else self.args.enc_in - 1
+                for i in range(feat_idx):
                     gt = input[0, :, i]
                     pd = np.concatenate((input[0, :, i], outputs[0, :, i]), axis=0)
 
